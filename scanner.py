@@ -1,7 +1,13 @@
+"""
+lox.scanner
+~~~~~~~~~~~~~~~~
+handles lexing
+"""
 from enum import Enum, auto
 
 
 class TokenType(Enum):
+    """ Token types"""
     # assign automatic values
     # Single-character tokens.
     LEFT_PAREN = auto()
@@ -53,8 +59,9 @@ class TokenType(Enum):
 
 
 class Token:
-    def __init__(self, type, lexeme, literal, line):
-        self.type = type
+    """ Token class"""
+    def __init__(self, token_type, lexeme, literal, line):
+        self.type = token_type
         self.lexeme = lexeme
         self.literal = literal
         self.line = line
@@ -64,35 +71,58 @@ class Token:
 
 
 class Scanner:
+    """ Scanner class"""
     def __init__(self, source):
         self.error = None
-        self._source = source
         self.tokens = []
         self._start = 0
         self._current = 0
         self._line = 1
+        self._source = source
 
     def _at_end(self):
+        """
+        check if end
+        :return: (boolean) if end
+        """
         return self._current >= len(self._source)
 
     def _scan_token(self):
+        """
+        scans tokens
+        :return: None
+        """
         c = self._advance()
-        if c == '(': self.add_token(TokenType.LEFT_PAREN)
-        elif c == ')': self._add_token(TokenType.RIGHT_PAREN)
-        elif c == '{': self._add_token(TokenType.LEFT_BRACE)
-        elif c == '}': self._add_token(TokenType.RIGHT_BRACE)
-        elif c == ',': self._add_token(TokenType.COMMA)
-        elif c == '.': self._add_token(TokenType.DOT)
-        elif c == '-': self._add_token(TokenType.MINUS)
-        elif c == '+': self._add_token(TokenType.PLUS)
-        elif c == ';': self._add_token(TokenType.SEMICOLON)
-        elif c == '*': self._add_token(TokenType.STAR)
+        if c == '(':
+            self._add_token(TokenType.LEFT_PAREN)
+        elif c == ')':
+            self._add_token(TokenType.RIGHT_PAREN)
+        elif c == '{':
+            self._add_token(TokenType.LEFT_BRACE)
+        elif c == '}':
+            self._add_token(TokenType.RIGHT_BRACE)
+        elif c == ',':
+            self._add_token(TokenType.COMMA)
+        elif c == '.':
+            self._add_token(TokenType.DOT)
+        elif c == '-':
+            self._add_token(TokenType.MINUS)
+        elif c == '+':
+            self._add_token(TokenType.PLUS)
+        elif c == ';':
+            self._add_token(TokenType.SEMICOLON)
+        elif c == '*':
+            self._add_token(TokenType.STAR)
 
         # operators
-        elif c == '!': self._add_token(TokenType.BANG_EQUAL if self._match('=') else TokenType.BANG)
-        elif c == '=': self._add_token(TokenType.EQUAL_EQUAL if self._match('=') else TokenType.EQUAL)
-        elif c == '<': self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.Less)
-        elif c == '>': self._add_token(TokenType.GREATER_EQUAL if self._match('=') else TokenType.GREATER)
+        elif c == '!':
+            self._add_token(TokenType.BANG_EQUAL if self._match('=') else TokenType.BANG)
+        elif c == '=':
+            self._add_token(TokenType.EQUAL_EQUAL if self._match('=') else TokenType.EQUAL)
+        elif c == '<':
+            self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.Less)
+        elif c == '>':
+            self._add_token(TokenType.GREATER_EQUAL if self._match('=') else TokenType.GREATER)
 
         elif c == '/':
             if self._match('/'):
@@ -106,7 +136,8 @@ class Scanner:
             self.line += 1
 
         # string literal
-        elif c == '"': self._string()
+        elif c == '"':
+            self._string()
 
         # number
         elif c.isdigit():
@@ -119,15 +150,30 @@ class Scanner:
         else:
             self.error(self._line, "unexpected character: {}".format(c))
 
-    def _add_token(self, type, literal=None):
+    def _add_token(self, token_type, literal=None):
+        """
+        adds token to self.tokens
+        :param type: the type
+        :param literal: literbal
+        :return: None
+        """
         text = self._source[self._start:self._current]
-        self.tokens.append(Token(type, text, literal, self._line))
+        self.tokens.append(Token(token_type, text, literal, self._line))
 
     def _advance(self):
-        self._current+=1
+        """
+        advance position in self._source
+        :return: next position in source
+        """
+        self._current += 1
         return self._source[self._current - 1]
 
     def _match(self, expected):
+        """
+        find whether there is a match
+        :param expected: the expected match
+        :return: (boolean)
+        """
         if self._at_end():
             return False
         if self._source[self._current] != expected:
@@ -136,12 +182,20 @@ class Scanner:
         return True
 
     def _peek(self):
+        """
+        peek at the next char/token
+        :return: next position in source
+        """
         if self._at_end():
             return '\0'
         else:
             return self._source[self._current]
 
     def _string(self):
+        """
+        gets the string lexeme
+        :return: (string)
+        """
         while self._peek() != '"' and not self._at_end():
             if self._peek() == '\n':
                 self._line += 1
@@ -154,10 +208,14 @@ class Scanner:
             self._advance()
 
             # trim the surrounding quotes
-            value = self._source[self._start + 1 : self._current - 1]
+            value = self._source[self._start + 1: self._current - 1]
             self._add_token(TokenType.STRING, value)
 
     def _number(self):
+        """
+        get the number if a digit is detected and add to token
+        :return:
+        """
         while self._peek().isdigit():
             self._advance()
         if self._peek() == '.' and self._peek_next().isdigit():
@@ -167,20 +225,29 @@ class Scanner:
         self._add_token(TokenType.NUMBER, float(self._source[self._start:self._current]))
 
     def _peek_next(self):
+        """
+        peek_next
+        :return: (string)
+        """
         if self._current + 1 > len(self._source):
             return '/0'
         return self._source[self._current + 1]
 
     def _identifier(self):
+        """
+        identifier
+        :return:
+        """
         while self._peek().isalnum():
             self._advance()
         self._add_token(TokenType.IDENTIFIER)
 
     def scan_tokens(self):
+        """
+        scan tokens calling _scan_token
+        :return:
+        """
         while not self._at_end():
             self._start = self._current
             self._scan_token()
             self.tokens.append(Token(TokenType.EOF, "", None, self._source))
-
-
-

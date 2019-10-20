@@ -4,6 +4,7 @@ lox.lox
 The main file for the lox programming language interpreter
 """
 import sys
+from parser import Parser
 from scanner import Scanner
 
 
@@ -35,14 +36,18 @@ class Lox:
             # If we had an error, we should reset at new prompt
             self.had_error = False
             self.had_runtime_error = False
-    @staticmethod
-    def run(line):
+
+    def run(self, line):
         """ Runs the input
         :param line: line to tokenize and eval
         """
         scanner = Scanner(line)
-        scanner.scan_tokens()
-        #list tokens here, loop through token and print them out
+        tokens = scanner.scan_tokens()
+        parser = Parser(tokens, self.error)
+        expression = parser.parse()
+        print(expression)
+        if self.had_error:
+            return
 
     def error(self, line, message):
         """ error

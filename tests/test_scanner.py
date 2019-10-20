@@ -8,18 +8,11 @@ class TestScannerStatement:
         scanner.scan_tokens()
         assert scanner._source == "var language = lox;"
         assert scanner.tokens[0].__dict__['lexeme'] == 'var'
-        assert scanner.tokens[1].__dict__.get('lexeme') == ''
-        assert scanner.tokens[2].__dict__.get('lexeme') == ''
-        assert scanner.tokens[3].__dict__.get('lexeme') == 'language'
-        assert scanner.tokens[4].__dict__.get('lexeme') == ''
+        assert scanner.tokens[1].__dict__.get('lexeme') == 'language'
+        assert scanner.tokens[2].__dict__.get('lexeme') == '='
+        assert scanner.tokens[3].__dict__.get('lexeme') == 'lox'
+        assert scanner.tokens[4].__dict__.get('lexeme') == ';'
         assert scanner.tokens[5].__dict__.get('lexeme') == ''
-        assert scanner.tokens[6].__dict__.get('lexeme') == '='
-        assert scanner.tokens[7].__dict__.get('lexeme') == ''
-        assert scanner.tokens[8].__dict__.get('lexeme') == ''
-        assert scanner.tokens[9].__dict__.get('lexeme') == 'lox'
-        assert scanner.tokens[10].__dict__.get('lexeme') == ''
-        assert scanner.tokens[11].__dict__.get('lexeme') == ';'
-        assert scanner.tokens[10].__dict__.get('lexeme') == ''
 
 
 class TestScannerSingleChars:
@@ -29,10 +22,8 @@ class TestScannerSingleChars:
         scanner.scan_tokens()
         assert scanner.tokens[0].__dict__['lexeme'] == '('
         assert scanner.tokens[0].__dict__['type'] == TokenType.LEFT_PAREN
-        assert scanner.tokens[1].__dict__['lexeme'] == ''
-        assert scanner.tokens[1].__dict__['type'] == TokenType.EOF
-        assert scanner.tokens[2].__dict__['lexeme'] == ')'
-        assert scanner.tokens[2].__dict__['type'] == TokenType.RIGHT_PAREN
+        assert scanner.tokens[1].__dict__['lexeme'] == ')'
+        assert scanner.tokens[1].__dict__['type'] == TokenType.RIGHT_PAREN
 
     def test_braces(self):
         line = "{}"
@@ -41,10 +32,8 @@ class TestScannerSingleChars:
         print(scanner)
         assert scanner.tokens[0].__dict__['lexeme'] == '{'
         assert scanner.tokens[0].__dict__['type'] == TokenType.LEFT_BRACE
-        assert scanner.tokens[1].__dict__['lexeme'] == ''
-        assert scanner.tokens[1].__dict__['type'] == TokenType.EOF
-        assert scanner.tokens[2].__dict__['lexeme'] == '}'
-        assert scanner.tokens[2].__dict__['type'] == TokenType.RIGHT_BRACE
+        assert scanner.tokens[1].__dict__['lexeme'] == '}'
+        assert scanner.tokens[1].__dict__['type'] == TokenType.RIGHT_BRACE
 
     def test_comma(self):
         line = ","

@@ -123,7 +123,6 @@ class Scanner:
             self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.Less)
         elif c == '>':
             self._add_token(TokenType.GREATER_EQUAL if self._match('=') else TokenType.GREATER)
-
         elif c == '/':
             if self._match('/'):
                 while self._peek() != '\n' and not self._at_end():
@@ -250,4 +249,5 @@ class Scanner:
         while not self._at_end():
             self._start = self._current
             self._scan_token()
-            self.tokens.append(Token(TokenType.EOF, "", None, self._source))
+        self.tokens.append(Token(TokenType.EOF, "", None, self._source))
+        return self.tokens

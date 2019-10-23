@@ -5,6 +5,7 @@ The main file for the lox programming language interpreter
 """
 import sys
 from parser import Parser
+from interpreter import Interpreter
 from scanner import Scanner
 
 
@@ -13,6 +14,7 @@ class Lox:
     def __init__(self):
         self.had_error = False
         self.had_runtime_error = False
+        self.interpreter = Interpreter()
 
     def run_file(self, file):
         """ Runs file
@@ -45,7 +47,7 @@ class Lox:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, self.error)
         expression = parser.parse()
-        print(expression)
+        print(self.interpreter.interpret(expression))
         if self.had_error:
             return
 
@@ -55,6 +57,16 @@ class Lox:
         :param message: error message
         """
         self.report(line + " " + message)
+
+    def runtimeerror(self, error):
+        """
+        set runtimeerror message
+        :param error: error message
+        :return: None
+        """
+        error_message = "{0} \n [line {1}]".format(error.get_message(), error.token.line)
+        print(error_message)
+        self.had_runtime_error = True
 
     def report(self, line, where=None, message=None):
         """ error

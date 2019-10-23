@@ -144,7 +144,9 @@ disable=print-statement,
         no-member,
         invalid-name,
         too-many-branches,
-        arguments-differ
+        arguments-differ,
+        too-many-return-statements,
+        redefined-builtin
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

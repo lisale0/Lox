@@ -3,6 +3,7 @@ Parser
 ~~~~~~~~~~~~~~~~
 """
 import expr as Expr
+import stmt as Stmt
 from scanner import TokenType
 
 
@@ -20,10 +21,29 @@ class Parser:
         parse
         :return: expressions
         """
-        try:
-            return self._expression()
-        except ParseError:
-            return None
+        # try:
+        #     return self._expression()
+        # except ParseError:
+        #     return None
+        statements = []
+        while not self._at_end():
+            statements.append(self._statement())
+        return statements
+
+    def _statement(self):
+        if self._match(types=[TokenType.PRINT]):
+            return self._print_statement()
+        return self._expression_statement()
+
+    def _print_statement(self):
+        value = self._expression();
+        self._consume(TokenType.SEMICOLON, "Expect ';' after value.");
+        return Stmt.Print(value);
+
+    def _expression_statement(self):
+        expr = self._expression()
+        self._consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+        return Stmt.Expression(expr)
 
     def _expression(self):
         """ expression  """

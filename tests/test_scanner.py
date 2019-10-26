@@ -101,3 +101,9 @@ class TestScannerSingleChars:
         assert scanner.tokens[0].__dict__['type'] == TokenType.STAR
         assert scanner.tokens[1].__dict__['lexeme'] == ''
         assert scanner.tokens[1].__dict__['type'] == TokenType.EOF
+
+    def test_string(self):
+        line = '"one"'
+        scanner = Scanner(line)
+        assert scanner.tokens[0].__dict__['type'] == TokenType.STRING
+        assert scanner.tokens[0].__dict__['literal'] == "one"

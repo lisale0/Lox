@@ -10,17 +10,17 @@ class Interpreter(Visitor):
     """
     interpreter class
     """
-    def interpret(self, expression):
+    def interpret(self, statements):
         """
         called by lox to interpret expression
-        :param expression: expression
+        :param statements: statements
         :return: None
         """
         try:
-            value = self._evaluate(expression)
-            return value
-        except LoxRuntimeError as error:
-            LoxRuntimeError(message=error)
+            for statement in statements:
+                self._execute(statement)
+        except RuntimeError as error:
+            LoxRuntimeError(error)
 
     def visit_binary_expr(self, expr):
         """
@@ -97,6 +97,15 @@ class Interpreter(Visitor):
         else:
             return None
 
+    def visit_expression_stmt(self, stmt):
+        self._evaluate(stmt.expression)
+        return None
+
+    def visit_print_stmt(self, stmt):
+        value = self._evaluate(stmt.expression)
+        print(self._stringify(value))
+        return None
+
     def _evaluate(self, expr):
         """
         evaluate the expressions
@@ -104,6 +113,9 @@ class Interpreter(Visitor):
         :return:
         """
         return expr.accept(self)
+
+    def _execute(self, stmt):
+        stmt.accept(self)
 
     @staticmethod
     def _is_truthy(object):

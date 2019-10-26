@@ -20,7 +20,16 @@ class Visitor(ABC):
     def visit_unary_expr(self):
         pass
 
+    @abstractmethod    
+    def visit_expression_stmt(self):
+        pass
 
+    @abstractmethod    
+    def visit_print_stmt(self):
+        pass
+
+
+# ExprVisitor
 class Expr(ABC):
     @abstractmethod
     def accept(self, visitor):
@@ -69,5 +78,13 @@ class Chain(Expr):
 
     def accept(self, visitor):
         return visitor.visit_chain_expr(self)
+
+
+class Variable(Expr):
+    def __init__(self, name):
+        self.name = name
+
+    def accept(self, visitor):
+        return visitor.visit_variable_expr(self)
 
 

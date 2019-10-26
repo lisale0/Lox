@@ -80,6 +80,25 @@ class Scanner:
         self._line = 1
         self._source = source
 
+        self._keywords = {
+            "print": TokenType.PRINT,
+            "var": TokenType.VAR,
+            "and": TokenType.AND,
+            "class": TokenType.CLASS,
+            "else": TokenType.ELSE,
+            "false": TokenType.FALSE,
+            "fun": TokenType.FUN,
+            "for": TokenType.FOR,
+            "if": TokenType.IF,
+            "nil": TokenType.NIL,
+            "or": TokenType.OR,
+            "return": TokenType.RETURN,
+            "super": TokenType.SUPER,
+            "this": TokenType.THIS,
+            "true": TokenType.TRUE,
+            "while": TokenType.WHILE
+        }
+
     def _at_end(self):
         """
         check if end
@@ -132,7 +151,7 @@ class Scanner:
         elif c in {' ', '\r', '\t'}:
             pass
         elif c == '\n':
-            self.line += 1
+            self._line += 1
 
         # string literal
         elif c == '"':
@@ -198,17 +217,17 @@ class Scanner:
         while self._peek() != '"' and not self._at_end():
             if self._peek() == '\n':
                 self._line += 1
-                self._advance()
-            if self._at_end():
-                self.error = "{0} Unterminated string.".format(self._line)
-                return
+            self._advance()
+        if self._at_end():
+            self.error = "{0} Unterminated string.".format(self._line)
+            return
 
             # advance to find "
-            self._advance()
+        self._advance()
 
-            # trim the surrounding quotes
-            value = self._source[self._start + 1: self._current - 1]
-            self._add_token(TokenType.STRING, value)
+        # trim the surrounding quotes
+        value = self._source[self._start + 1: self._current - 1]
+        self._add_token(TokenType.STRING, value)
 
     def _number(self):
         """
@@ -239,7 +258,12 @@ class Scanner:
         """
         while self._peek().isalnum():
             self._advance()
-        self._add_token(TokenType.IDENTIFIER)
+        if self._source[self._start:self._current] in self._keywords:
+            key = self._source[self._start:self._current]
+            reserved_type = self._keywords[key]
+            self._add_token(reserved_type)
+        else:
+            self._add_token(TokenType.IDENTIFIER)
 
     def scan_tokens(self):
         """

@@ -9,6 +9,7 @@ tab = "    "
 base_desc = {
     "Expr": {
         "Unary": [["scanner.Token", "operator"], ["Expr", "right"]],
+        "Assign": [["Token", "name"], ["Expr", "value"]],
         "Binary": [["Expr", "left"], ["scanner.Token", "operator"], ["Expr", "right"]],
         "Grouping" : [["Expr", "expression"]],
         "Literal" : [["object", "value"]],
@@ -16,6 +17,7 @@ base_desc = {
         "Variable": [["Token", "name"]]
     },
     "Stmt": {
+        "Block": [["Stmt", "statements"]],
         "Expression": [["Expr", "expression"]],
         "Print": [["Expr", "expression"]],
         "Var": [["Token", "name"], ["Expr", "initializer"]]
@@ -41,7 +43,9 @@ def define_visitor(con):
     :return: None
     """
     visitors = ["visit_binary_expr", "visit_grouping_expr",
-                "visit_literal_expr", "visit_unary_expr", "visit_expression_stmt", "visit_print_stmt"]
+                "visit_literal_expr", "visit_unary_expr", "visit_assign_expr",
+                "visit_expression_stmt", "visit_print_stmt", "visit_var_stmt",
+                "visit_block_stmt", "visit_variable_expr"]
     visitor_def = [tab + "@abstractmethod" + tab + "\n" + tab + "def "\
                    + visitor + "(self):\n" + tab + tab + "pass\n\n" \
                    for visitor in visitors]

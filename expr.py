@@ -21,11 +21,27 @@ class Visitor(ABC):
         pass
 
     @abstractmethod    
+    def visit_assign_expr(self):
+        pass
+
+    @abstractmethod    
     def visit_expression_stmt(self):
         pass
 
     @abstractmethod    
     def visit_print_stmt(self):
+        pass
+
+    @abstractmethod    
+    def visit_var_stmt(self):
+        pass
+
+    @abstractmethod    
+    def visit_block_stmt(self):
+        pass
+
+    @abstractmethod    
+    def visit_variable_expr(self):
         pass
 
 
@@ -43,6 +59,15 @@ class Unary(Expr):
 
     def accept(self, visitor):
         return visitor.visit_unary_expr(self)
+
+
+class Assign(Expr):
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visit_assign_expr(self)
 
 
 class Binary(Expr):

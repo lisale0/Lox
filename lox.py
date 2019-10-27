@@ -47,7 +47,7 @@ class Lox:
         scanner = Scanner(line)
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, self.error)
-        statements = parser.parse();
+        statements = parser.parse()
         self.interpreter.interpret(statements)
         if self.had_error:
             return

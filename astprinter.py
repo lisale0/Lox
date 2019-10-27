@@ -46,6 +46,21 @@ class ASTPrinter(Visitor):
         """
         return self.parenthesize(expr.operator.lexeme, exprs=[expr.right])
 
+    def visit_assign_expr(self):
+        pass
+
+    def visit_block_stmt(self):
+        pass
+
+    def visit_expression_stmt(self):
+        pass
+
+    def visit_print_stmt(self):
+        pass
+
+    def visit_var_stmt(self):
+        pass
+
     def parenthesize(self, name, exprs):
         """
         parenthesize the expressions

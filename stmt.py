@@ -10,6 +10,14 @@ class Stmt(ABC):
         pass
 
 
+class Block(Stmt):
+    def __init__(self, statements):
+        self.statements = statements
+
+    def accept(self, visitor):
+        return visitor.visit_block_stmt(self)
+
+
 class Expression(Stmt):
     def __init__(self, expression):
         self.expression = expression

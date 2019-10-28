@@ -139,7 +139,7 @@ class Scanner:
         elif c == '=':
             self._add_token(TokenType.EQUAL_EQUAL if self._match('=') else TokenType.EQUAL)
         elif c == '<':
-            self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.Less)
+            self._add_token(TokenType.LESS_EQUAL if self._match('=') else TokenType.LESS)
         elif c == '>':
             self._add_token(TokenType.GREATER_EQUAL if self._match('=') else TokenType.GREATER)
         elif c == '/':

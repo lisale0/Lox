@@ -44,6 +44,18 @@ class Visitor(ABC):
     def visit_variable_expr(self):
         pass
 
+    @abstractmethod    
+    def visit_if_stmt(self):
+        pass
+
+    @abstractmethod    
+    def visit_logical_expr(self):
+        pass
+
+    @abstractmethod    
+    def visit_while_stmt(self):
+        pass
+
 
 # ExprVisitor
 class Expr(ABC):
@@ -94,6 +106,16 @@ class Literal(Expr):
 
     def accept(self, visitor):
         return visitor.visit_literal_expr(self)
+
+
+class Logical(Expr):
+    def __init__(self, left, operator, right):
+        self.left = left
+        self.operator = operator
+        self.right = right
+
+    def accept(self, visitor):
+        return visitor.visit_logical_expr(self)
 
 
 class Chain(Expr):

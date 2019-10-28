@@ -4,23 +4,27 @@ Interpreter
 """
 from expr import Visitor
 from scanner import TokenType
+from environment import Environment
 
 
 class Interpreter(Visitor):
     """
     interpreter class
     """
-    def interpret(self, expression):
+    def __init__(self):
+        self.environment = Environment(values={})
+
+    def interpret(self, statements):
         """
         called by lox to interpret expression
-        :param expression: expression
+        :param statements: statements
         :return: None
         """
         try:
-            value = self._evaluate(expression)
-            return value
-        except LoxRuntimeError as error:
-            LoxRuntimeError(message=error)
+            for statement in statements:
+                self._execute(statement)
+        except RuntimeError as error:
+            LoxRuntimeError(error)
 
     def visit_binary_expr(self, expr):
         """
@@ -97,6 +101,30 @@ class Interpreter(Visitor):
         else:
             return None
 
+    def visit_expression_stmt(self, stmt):
+        self._evaluate(stmt.expression)
+
+    def visit_print_stmt(self, stmt):
+        value = self._evaluate(stmt.expression)
+        print(self._stringify(value))
+
+    def visit_variable_expr(self, expr):
+        return self.environment.get(expr.name)
+
+    def visit_var_stmt(self, stmt):
+        value = None
+        if stmt.initializer is not None:
+            value = self._evaluate(stmt.initializer)
+        self.environment.define(stmt.name.lexeme, value)
+
+    def visit_assign_expr(self, expr):
+        value = self._evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value
+
+    def visit_block_stmt(self, stmt):
+        self._execute_block(stmt.statements(), Environment())
+
     def _evaluate(self, expr):
         """
         evaluate the expressions
@@ -104,6 +132,18 @@ class Interpreter(Visitor):
         :return:
         """
         return expr.accept(self)
+
+    def _execute(self, stmt):
+        stmt.accept(self)
+
+    def _execute_block(self, statements, environment):
+        previous = self.environment
+        try:
+            self.environment = environment
+            for statement in statements:
+                self._execute(statement)
+        finally:
+            self.environment = previous
 
     @staticmethod
     def _is_truthy(object):

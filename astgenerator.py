@@ -9,10 +9,18 @@ tab = "    "
 base_desc = {
     "Expr": {
         "Unary": [["scanner.Token", "operator"], ["Expr", "right"]],
+        "Assign": [["Token", "name"], ["Expr", "value"]],
         "Binary": [["Expr", "left"], ["scanner.Token", "operator"], ["Expr", "right"]],
         "Grouping" : [["Expr", "expression"]],
         "Literal" : [["object", "value"]],
         "Chain": [["Expr", "left"], ["Expr", "right"]],
+        "Variable": [["Token", "name"]]
+    },
+    "Stmt": {
+        "Block": [["Stmt", "statements"]],
+        "Expression": [["Expr", "expression"]],
+        "Print": [["Expr", "expression"]],
+        "Var": [["Token", "name"], ["Expr", "initializer"]]
     }
 }
 
@@ -35,7 +43,9 @@ def define_visitor(con):
     :return: None
     """
     visitors = ["visit_binary_expr", "visit_grouping_expr",
-                "visit_literal_expr", "visit_unary_expr"]
+                "visit_literal_expr", "visit_unary_expr", "visit_assign_expr",
+                "visit_expression_stmt", "visit_print_stmt", "visit_var_stmt",
+                "visit_block_stmt", "visit_variable_expr"]
     visitor_def = [tab + "@abstractmethod" + tab + "\n" + tab + "def "\
                    + visitor + "(self):\n" + tab + tab + "pass\n\n" \
                    for visitor in visitors]
@@ -81,12 +91,18 @@ def define_type(con, base_name, class_name, fields):
     con.write("\n")
     con.writelines([tab + "def accept(self, visitor):\n",
                     tab + tab + "return visitor.visit_"
-                    + class_name.lower() + "_expr" + "(self)\n\n\n"])
+                    + class_name.lower() + "_" + base_name.lower() + "(self)\n\n\n"])
 
 
 if __name__ == "__main__":
-    path = "expr.py"
-    with open(path, "w+") as f:
+    expr_path = "expr.py"
+    stmt_path = "stmt.py"
+    with open(expr_path, "w+") as f:
         begin(f)
         define_visitor(f)
+        f.write("# ExprVisitor\n")
         define_ast(f, "Expr", base_desc["Expr"])
+    with open(stmt_path, "w+") as f:
+        begin(f)
+        f.write("# StmtVisitor\n")
+        define_ast(f, "Stmt", base_desc["Stmt"])

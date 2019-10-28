@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 lox.lox
 ~~~~~~~~~~~~~~~~
@@ -46,8 +47,8 @@ class Lox:
         scanner = Scanner(line)
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, self.error)
-        expression = parser.parse()
-        print(self.interpreter.interpret(expression))
+        statements = parser.parse()
+        self.interpreter.interpret(statements)
         if self.had_error:
             return
 
@@ -86,7 +87,7 @@ def main():
         print("Usage: jlox [script]")
         sys.exit(64)
     elif len(sys.argv) == 2:
-        lox.run_file(sys.argv[0])
+        lox.run_file(sys.argv[1])
     else:
         lox.run_prompt()
 

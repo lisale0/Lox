@@ -2,12 +2,15 @@
 Environment
 ~~~~~~~~~~~~~~~~
 """
+from error import LoxRuntimeError
+
+
 class Environment:
     """
     Environment
     """
-    def __init__(self, values=None, enclosing=None):
-        self.values = values
+    def __init__(self, enclosing=None):
+        self.values = {}
         self._enclosing = enclosing
 
     def define(self, name, value):
@@ -24,13 +27,12 @@ class Environment:
         :param name: key
         :return: str
         """
-        if self.values[name.lexeme]:
+        if self.values.get(name.lexeme) is not None:
             return self.values[name.lexeme]
 
-        if self._enclosing is not None:
-            return self._enclosing[name]
-
-        raise RuntimeError(message="Undefined variable '" + name.lexeme + "'.")
+        if self._enclosing:
+            return self._enclosing.values.get(name.lexeme)
+        raise LoxRuntimeError(name, "Undefined variable {0}.".format(name.lexeme))
 
     def assign(self, name, value):
         """
@@ -39,7 +41,11 @@ class Environment:
         :param value: val
         :return: None
         """
-        if self.values[name.lexeme]:
+        if self.values.get(name.lexeme):
             self.values[name.lexeme] = value
             return
-        raise RuntimeError(message="Undefined variable '" + name.lexeme + "'.")
+        if self._enclosing:
+            key = name.lexeme
+            self._enclosing.values[str(key)] = value
+            return
+        raise LoxRuntimeError(name, "Undefined variable {0}.".format(name.lexeme))

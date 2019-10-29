@@ -5,6 +5,7 @@ Interpreter
 from expr import Visitor
 from scanner import TokenType
 from environment import Environment
+from error import LoxRuntimeError
 
 
 class Interpreter(Visitor):
@@ -12,7 +13,7 @@ class Interpreter(Visitor):
     interpreter class
     """
     def __init__(self):
-        self.environment = Environment(values={})
+        self.environment = Environment()
 
     def interpret(self, statements):
         """
@@ -24,7 +25,7 @@ class Interpreter(Visitor):
             for statement in statements:
                 self._execute(statement)
         except RuntimeError as error:
-            LoxRuntimeError(error)
+            raise Exception(error)
 
     def visit_binary_expr(self, expr):
         """
@@ -123,7 +124,27 @@ class Interpreter(Visitor):
         return value
 
     def visit_block_stmt(self, stmt):
-        self._execute_block(stmt.statements(), Environment())
+        self._execute_block(stmt.statements, Environment(enclosing=self.environment))
+
+    def visit_if_stmt(self, stmt):
+        if self._is_truthy(self._evaluate(stmt.condition)):
+            self._execute(stmt.then_branch)
+        elif stmt.else_branch is not None:
+            self._execute(stmt.else_branch)
+
+    def visit_logical_expr(self, expr):
+        left = self._evaluate(expr.left)
+        if expr.operator.type == TokenType.OR:
+            if self._is_truthy(left):
+                return left
+        else:
+            if self._is_truthy(left):
+                return left
+        return self._evaluate(expr.right)
+
+    def visit_while_stmt(self, stmt):
+        while self._is_truthy(self._evaluate(stmt.condition)):
+            self._execute(stmt.body)
 
     def _evaluate(self, expr):
         """
@@ -199,12 +220,3 @@ class Interpreter(Visitor):
                     text = text[:-2]
                 return text
         return str(object)
-
-
-class LoxRuntimeError(RuntimeError):
-    """
-    Lox Runtime Error
-    """
-    def __init__(self, token=None, message=None):
-        RuntimeError.__init__(message)
-        self.token = token

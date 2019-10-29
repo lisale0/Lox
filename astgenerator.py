@@ -13,14 +13,17 @@ base_desc = {
         "Binary": [["Expr", "left"], ["scanner.Token", "operator"], ["Expr", "right"]],
         "Grouping" : [["Expr", "expression"]],
         "Literal" : [["object", "value"]],
+        "Logical": [["Expr", "left"], ["Token", "operator"], ["Expr", "right"]],
         "Chain": [["Expr", "left"], ["Expr", "right"]],
         "Variable": [["Token", "name"]]
     },
     "Stmt": {
         "Block": [["Stmt", "statements"]],
         "Expression": [["Expr", "expression"]],
+        "If": [["Expr", "condition"], ["Stmt", "then_branch"], ["Stmt", "else_branch"]],
         "Print": [["Expr", "expression"]],
-        "Var": [["Token", "name"], ["Expr", "initializer"]]
+        "Var": [["Token", "name"], ["Expr", "initializer"]],
+        "While": [["Expr", "condition"], ["Stmt", "body"]]
     }
 }
 
@@ -45,7 +48,8 @@ def define_visitor(con):
     visitors = ["visit_binary_expr", "visit_grouping_expr",
                 "visit_literal_expr", "visit_unary_expr", "visit_assign_expr",
                 "visit_expression_stmt", "visit_print_stmt", "visit_var_stmt",
-                "visit_block_stmt", "visit_variable_expr"]
+                "visit_block_stmt", "visit_variable_expr", "visit_if_stmt",
+                "visit_logical_expr", "visit_while_stmt"]
     visitor_def = [tab + "@abstractmethod" + tab + "\n" + tab + "def "\
                    + visitor + "(self):\n" + tab + tab + "pass\n\n" \
                    for visitor in visitors]

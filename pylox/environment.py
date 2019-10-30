@@ -2,7 +2,7 @@
 Environment
 ~~~~~~~~~~~~~~~~
 """
-from error import LoxRuntimeError
+from pylox.error import LoxRuntimeError
 
 
 class Environment:

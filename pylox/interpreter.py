@@ -2,10 +2,10 @@
 Interpreter
 ~~~~~~~~~~~~~~~~
 """
-from expr import Visitor
-from scanner import TokenType
-from environment import Environment
-from error import LoxRuntimeError
+from pylox.expr import Visitor
+from pylox.scanner import TokenType
+from pylox.environment import Environment
+from pylox.error import LoxRuntimeError
 
 
 class Interpreter(Visitor):
@@ -26,6 +26,26 @@ class Interpreter(Visitor):
                 self._execute(statement)
         except RuntimeError as error:
             raise Exception(error)
+
+    def _evaluate(self, expr):
+        """
+        evaluate the expressions
+        :param expr: expression
+        :return:
+        """
+        return expr.accept(self)
+
+    def _execute_block(self, statements, environment):
+        previous = self.environment
+        try:
+            self.environment = environment
+            for statement in statements:
+                self._execute(statement)
+        finally:
+            self.environment = previous
+
+    def _execute(self, stmt):
+        stmt.accept(self)
 
     def visit_binary_expr(self, expr):
         """
@@ -102,35 +122,13 @@ class Interpreter(Visitor):
         else:
             return None
 
-    def visit_expression_stmt(self, stmt):
-        self._evaluate(stmt.expression)
-
-    def visit_print_stmt(self, stmt):
-        value = self._evaluate(stmt.expression)
-        print(self._stringify(value))
-
     def visit_variable_expr(self, expr):
         return self.environment.get(expr.name)
-
-    def visit_var_stmt(self, stmt):
-        value = None
-        if stmt.initializer is not None:
-            value = self._evaluate(stmt.initializer)
-        self.environment.define(stmt.name.lexeme, value)
 
     def visit_assign_expr(self, expr):
         value = self._evaluate(expr.value)
         self.environment.assign(expr.name, value)
         return value
-
-    def visit_block_stmt(self, stmt):
-        self._execute_block(stmt.statements, Environment(enclosing=self.environment))
-
-    def visit_if_stmt(self, stmt):
-        if self._is_truthy(self._evaluate(stmt.condition)):
-            self._execute(stmt.then_branch)
-        elif stmt.else_branch is not None:
-            self._execute(stmt.else_branch)
 
     def visit_logical_expr(self, expr):
         left = self._evaluate(expr.left)
@@ -142,29 +140,31 @@ class Interpreter(Visitor):
                 return left
         return self._evaluate(expr.right)
 
+    def visit_block_stmt(self, stmt):
+        self._execute_block(stmt.statements, Environment(enclosing=self.environment))
+
+    def visit_if_stmt(self, stmt):
+        if self._is_truthy(self._evaluate(stmt.condition)):
+            self._execute(stmt.then_branch)
+        elif stmt.else_branch is not None:
+            self._execute(stmt.else_branch)
+
     def visit_while_stmt(self, stmt):
         while self._is_truthy(self._evaluate(stmt.condition)):
             self._execute(stmt.body)
 
-    def _evaluate(self, expr):
-        """
-        evaluate the expressions
-        :param expr: expression
-        :return:
-        """
-        return expr.accept(self)
+    def visit_var_stmt(self, stmt):
+        value = None
+        if stmt.initializer is not None:
+            value = self._evaluate(stmt.initializer)
+        self.environment.define(stmt.name.lexeme, value)
 
-    def _execute(self, stmt):
-        stmt.accept(self)
+    def visit_expression_stmt(self, stmt):
+        self._evaluate(stmt.expression)
 
-    def _execute_block(self, statements, environment):
-        previous = self.environment
-        try:
-            self.environment = environment
-            for statement in statements:
-                self._execute(statement)
-        finally:
-            self.environment = previous
+    def visit_print_stmt(self, stmt):
+        value = self._evaluate(stmt.expression)
+        print(self._stringify(value))
 
     @staticmethod
     def _is_truthy(object):

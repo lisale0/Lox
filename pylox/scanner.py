@@ -99,6 +99,17 @@ class Scanner:
             "while": TokenType.WHILE
         }
 
+    def scan_tokens(self):
+        """
+        scan tokens calling _scan_token
+        :return:
+        """
+        while not self._at_end():
+            self._start = self._current
+            self._scan_token()
+        self.tokens.append(Token(TokenType.EOF, "", None, self._source))
+        return self.tokens
+
     def _at_end(self):
         """
         check if end
@@ -264,14 +275,3 @@ class Scanner:
             self._add_token(reserved_type)
         else:
             self._add_token(TokenType.IDENTIFIER)
-
-    def scan_tokens(self):
-        """
-        scan tokens calling _scan_token
-        :return:
-        """
-        while not self._at_end():
-            self._start = self._current
-            self._scan_token()
-        self.tokens.append(Token(TokenType.EOF, "", None, self._source))
-        return self.tokens

@@ -1,4 +1,4 @@
-from scanner import Scanner, TokenType
+from pylox.scanner import Scanner, TokenType
 
 
 class TestScannerStatement:

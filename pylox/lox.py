@@ -5,9 +5,9 @@ lox.lox
 The main file for the lox programming language interpreter
 """
 import sys
-from parser import Parser
-from interpreter import Interpreter
-from scanner import Scanner
+from pylox.parser import Parser
+from pylox.interpreter import Interpreter
+from pylox.scanner import Scanner
 
 
 class Lox:

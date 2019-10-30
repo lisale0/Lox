@@ -3,10 +3,10 @@ test.test_parser
 ~~~~~~~~~~~~~~~~
 Test file for parser
 """
-from parser import Parser
-from scanner import Scanner
-import expr
-import stmt
+from pylox.parser import Parser
+from pylox.scanner import Scanner
+from pylox import expr
+from pylox import stmt
 
 
 class TestExpressions:

@@ -2,7 +2,7 @@ GITCOMMIT := $(shell git rev-parse --short HEAD)
 
 .PHONY: lint
 lint:
-	@pylint -j 4 --rcfile=.pylintrc *.py
+	@pylint -j 4 --rcfile=.pylintrc ./pylox/*.py
 
 .PHONY: test
 test:

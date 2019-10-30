@@ -4,9 +4,10 @@ test.test_interpreter
 Test file for interpreter
 """
 
-from scanner import TokenType, Token, Scanner
-from parser import Parser
-from interpreter import Interpreter
+from pylox.scanner import Scanner
+from pylox.parser import Parser
+from pylox.interpreter import Interpreter
+
 
 class TestInterpreter:
     def test_var(self):
@@ -16,6 +17,3 @@ class TestInterpreter:
         parser = Parser(tokens, "")
         statements = parser.parse();
         Interpreter().interpret(statements)
-
-
-

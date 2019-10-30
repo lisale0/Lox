@@ -3,9 +3,9 @@
 prettyprint
 ~~~~~~~~~~~~~~~~
 """
-from expr import Visitor
-import expr as Expr
-from scanner import TokenType, Token
+from pylox.expr import Visitor
+import pylox.expr as Expr
+from pylox.scanner import TokenType, Token
 
 
 class ASTPrinter(Visitor):

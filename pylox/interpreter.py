@@ -2,18 +2,24 @@
 Interpreter
 ~~~~~~~~~~~~~~~~
 """
+import time
 from pylox.expr import Visitor
 from pylox.scanner import TokenType
 from pylox.environment import Environment
 from pylox.error import LoxRuntimeError
+from pylox.error import Return as ReturnError
+from pylox.loxcallable import LoxCallable
+from pylox.loxfunction import LoxFunction
 
 
-class Interpreter(Visitor):
+class Interpreter(Visitor, LoxCallable):
     """
     interpreter class
     """
     def __init__(self):
-        self.environment = Environment()
+        self.globals = Environment()
+        self.environment = self.globals
+        # self.globals.define("clock", LoxCallable())
 
     def interpret(self, statements):
         """
@@ -35,7 +41,13 @@ class Interpreter(Visitor):
         """
         return expr.accept(self)
 
-    def _execute_block(self, statements, environment):
+    def execute_block(self, statements, environment):
+        """
+        execute block statements
+        :param statements: statement
+        :param environment: environment
+        :return: None
+        """
         previous = self.environment
         try:
             self.environment = environment
@@ -45,6 +57,11 @@ class Interpreter(Visitor):
             self.environment = previous
 
     def _execute(self, stmt):
+        """
+        execute statement
+        :param stmt: statement
+        :return:
+        """
         stmt.accept(self)
 
     def visit_binary_expr(self, expr):
@@ -141,7 +158,7 @@ class Interpreter(Visitor):
         return self._evaluate(expr.right)
 
     def visit_block_stmt(self, stmt):
-        self._execute_block(stmt.statements, Environment(enclosing=self.environment))
+        self.execute_block(stmt.statements, Environment(enclosing=self.environment))
 
     def visit_if_stmt(self, stmt):
         if self._is_truthy(self._evaluate(stmt.condition)):
@@ -162,9 +179,40 @@ class Interpreter(Visitor):
     def visit_expression_stmt(self, stmt):
         self._evaluate(stmt.expression)
 
+    def visit_function_stmt(self, stmt):
+        function = LoxFunction(stmt, self.environment)
+        self.environment.define(stmt.name.lexeme, function)
+
     def visit_print_stmt(self, stmt):
         value = self._evaluate(stmt.expression)
         print(self._stringify(value))
+
+    def visit_return_stmt(self, stmt):
+        value = None
+        if stmt.value is not None:
+            value = self._evaluate(stmt.value)
+        raise ReturnError(value)
+
+    def visit_call_expr(self, expr):
+        callee = self._evaluate(expr.callee)
+        arguments = []
+        for argument in expr.arguments:
+            arguments.append(self._evaluate(argument))
+        if not isinstance(callee, LoxCallable):
+            raise LoxRuntimeError(expr.paren, "Can only call functions and classes.")
+        function = callee
+        # check arity
+        if len(arguments) is not function.arity():
+            error_msg = "Expected {} arguments, but got {}."\
+                .format(function.arity(), len(arguments))
+            raise LoxRuntimeError(expr.paren, error_msg)
+        return function.call(self, arguments)
+
+    def arity(self):
+        return 0
+
+    def call(self):
+        return time.time()
 
     @staticmethod
     def _is_truthy(object):

@@ -13,4 +13,15 @@ class LoxRuntimeError(RuntimeError):
         self.message = message
 
     def __str__(self):
-        return f"{self.message}\n[line {self.token.line}]"
+        return "{}\n[line {}]".format(self.message, self.token.line)
+
+
+class Return(RuntimeError):
+    """
+    Return
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return "return error: {}".format(self.value)

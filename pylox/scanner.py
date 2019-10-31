@@ -171,9 +171,6 @@ class Scanner:
         # number
         elif c.isdigit():
             self._number()
-        elif c == 'o':
-            if self._peek() == 'r':
-                self._add_token(TokenType.OR)
         elif c.isalpha():
             self._identifier()
         else:
@@ -269,9 +266,9 @@ class Scanner:
         """
         while self._peek().isalnum():
             self._advance()
-        if self._source[self._start:self._current] in self._keywords:
-            key = self._source[self._start:self._current]
-            reserved_type = self._keywords[key]
-            self._add_token(reserved_type)
+        text = self._source[self._start:self._current]
+        if text in self._keywords:
+            token_type = self._keywords[text]
         else:
-            self._add_token(TokenType.IDENTIFIER)
+            token_type = TokenType.IDENTIFIER
+        self._add_token(token_type)

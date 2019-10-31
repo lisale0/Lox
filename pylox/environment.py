@@ -21,6 +21,18 @@ class Environment:
         """
         self.values[name] = value
 
+    def ancestor(self, distance):
+        environment = self
+        for i in range(distance):
+            environment = environment._enclosing
+        return environment
+
+    def getAt(self, distance, name):
+        return self.ancestor(distance).values[name]
+
+    def assignAt(self, distance, name, value):
+        self.ancestor(distance).values[name.lexeme] = value
+
     def get(self, name):
         """
         return value

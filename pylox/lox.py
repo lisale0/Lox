@@ -7,6 +7,7 @@ The main file for the lox programming language interpreter
 import sys
 from pylox.parser import Parser
 from pylox.interpreter import Interpreter
+from pylox.resolver import Resolver
 from pylox.scanner import Scanner
 
 
@@ -48,6 +49,8 @@ class Lox:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, self.error)
         statements = parser.parse()
+        resolver = Resolver(self.interpreter)
+        resolver.resolve(statements)
         self.interpreter.interpret(statements)
         if self.had_error:
             return

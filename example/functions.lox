@@ -1,0 +1,19 @@
+fun strAppend(str1, str2) {
+  var str = str1 + str2;
+  return str;
+}
+
+fun add(a, b){
+  return(a + b);
+}
+
+fun checkNegative(num){
+  if(num <= 0)
+    return(true);
+  else
+    return(false);
+}
+
+print(add(10, 5));
+print(strAppend("foo", "bar"));
+print(checkNegative(-1));

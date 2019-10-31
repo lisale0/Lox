@@ -149,7 +149,8 @@ disable=print-statement,
         redefined-builtin,
         super-init-not-called,
         consider-using-enumerate,
-        raising-non-exception
+        raising-non-exception,
+        too-many-public-methods
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

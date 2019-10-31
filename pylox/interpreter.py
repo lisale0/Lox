@@ -19,7 +19,7 @@ class Interpreter(Visitor, LoxCallable):
     def __init__(self):
         self.globals = Environment()
         self.environment = self.globals
-        self.locals = []
+        self.locals = {}
 
     def interpret(self, statements):
         """
@@ -65,6 +65,12 @@ class Interpreter(Visitor, LoxCallable):
         stmt.accept(self)
 
     def resolve(self, expr, depth):
+        """
+        resolve expr
+        :param expr: expr
+        :param depth: depth
+        :return:
+        """
         self.locals[expr] = depth
 
     def visit_binary_expr(self, expr):
@@ -146,18 +152,21 @@ class Interpreter(Visitor, LoxCallable):
         return self._lookup_variable(expr.name, expr)
 
     def _lookup_variable(self, name, expr):
+        distance = None
         if expr in self.locals:
             distance = self.locals[expr]
-        if not distance:
+        if distance is not None:
             return self.environment.getAt(distance, name.lexeme)
+        else:
+            return self.globals.get(name)
 
     def visit_assign_expr(self, expr):
         value = self._evaluate(expr.value)
-        distance = self.locals[expr]
+        distance = self.locals.get(expr)
         if distance:
             self.environment.assignAt(distance, expr.name, value)
         else:
-            self.globals[expr.name] = value
+            self.globals.assign(expr.name, value)
         return value
 
     def visit_logical_expr(self, expr):

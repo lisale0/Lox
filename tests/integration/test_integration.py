@@ -81,6 +81,18 @@ class TestFunction:
         assert err == ''
         assert out == "False\n"
 
+    def test_recursion_2(self, capsys):
+        line='fun fibonacci(n) { \
+        if (n <= 1) return n; \
+        return fibonacci(n - 2) + fibonacci(n - 1); \
+        } \
+        print(fibonacci(13));'
+        lox = Lox()
+        lox.run(line)
+        out, err = capsys.readouterr()
+        assert err == ''
+        assert out == "233.0\n"
+
 
 class TestLoops:
     def test_while_loop(self, capsys):

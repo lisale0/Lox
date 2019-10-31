@@ -50,10 +50,10 @@ class Lox:
         parser = Parser(tokens, self.error)
         statements = parser.parse()
         resolver = Resolver(self.interpreter)
-        resolver.resolve(statements)
-        self.interpreter.interpret(statements)
         if self.had_error:
             return
+        resolver.resolve(statements)
+        self.interpreter.interpret(statements)
 
     def error(self, line, message):
         """ error

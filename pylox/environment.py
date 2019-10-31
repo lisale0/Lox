@@ -11,7 +11,7 @@ class Environment:
     """
     def __init__(self, enclosing=None):
         self.values = {}
-        self._enclosing = enclosing
+        self.enclosing = enclosing
 
     def define(self, name, value):
         """
@@ -22,15 +22,33 @@ class Environment:
         self.values[name] = value
 
     def ancestor(self, distance):
+        """
+        ancestor walks the chain of enclosing environments
+        :param distance:
+        :return:
+        """
         environment = self
-        for i in range(distance):
-            environment = environment._enclosing
+        for _ in range(distance):
+            environment = environment.enclosing
         return environment
 
     def getAt(self, distance, name):
+        """
+        get at
+        :param distance: distance
+        :param name: name
+        :return:
+        """
         return self.ancestor(distance).values[name]
 
     def assignAt(self, distance, name, value):
+        """
+        assign
+        :param distance:
+        :param name:
+        :param value:
+        :return:
+        """
         self.ancestor(distance).values[name.lexeme] = value
 
     def get(self, name):
@@ -42,8 +60,8 @@ class Environment:
         if self.values.get(name.lexeme) is not None:
             return self.values[name.lexeme]
 
-        if self._enclosing:
-            return self._enclosing.values.get(name.lexeme)
+        if self.enclosing:
+            return self.enclosing.values.get(name.lexeme)
         raise LoxRuntimeError(name, "Undefined variable {0}.".format(name.lexeme))
 
     def assign(self, name, value):
@@ -56,8 +74,8 @@ class Environment:
         if self.values.get(name.lexeme):
             self.values[name.lexeme] = value
             return
-        if self._enclosing:
+        if self.enclosing:
             key = name.lexeme
-            self._enclosing.values[str(key)] = value
+            self.enclosing.values[str(key)] = value
             return
         raise LoxRuntimeError(name, "Undefined variable {0}.".format(name.lexeme))

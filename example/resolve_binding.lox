@@ -1,0 +1,6 @@
+var n = "hello";
+fun count(n) {
+  print(n);
+}
+count(3);
+print(n);

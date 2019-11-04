@@ -103,8 +103,8 @@ def define_type(con, base_name, class_name, fields):
 
 
 if __name__ == "__main__":
-    expr_path = "expr.py"
-    stmt_path = "stmt.py"
+    expr_path = "../expr.py"
+    stmt_path = "../stmt.py"
     with open(expr_path, "w+") as f:
         begin(f)
         define_visitor(f)

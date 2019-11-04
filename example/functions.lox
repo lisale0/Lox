@@ -14,6 +14,17 @@ fun checkNegative(num){
     return(false);
 }
 
+fun isOdd(n) {
+  if (n == 0) return false;
+  return isEven(n - 1);
+}
+
+fun isEven(n){
+  if (n == 0) return true;
+  return isOdd(n - 1);
+}
+
+print(checkNegative(-1));
 print(add(10, 5));
 print(strAppend("foo", "bar"));
-print(checkNegative(-1));
+print(isEven(3));
